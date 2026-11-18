@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="minishop - a small collection of everyday products.">
+  <title>minishop</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <header class="header">
+      <a href="/" class="logo">mini<span>shop.</span></a>
+      <nav class="nav">
+        <a href="#cart" class="cart-link">
+          <img src="assets/icons/bag.svg" alt="cart" width="24" height="24">
+          <span>My Cart</span>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+      </nav>
+  </header>
+
+  <main class="container">
+
+    <section class="shop">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Curated for you</p>
+          <h1 id="shop-title">Shop the collection</h1>
+        </div>
+        <p class="product-count" id="productCount"></p>
+      </div>
+
+      <div class="products" id="products"></div>
+    </section>
+
+    <section class="cart" id="cart">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Your picks</p>
+          <h2 class="cart-title" id="cart-title">Shopping cart <span class="cart-items" id="cartItems">(0)</span></h2>
+        </div>
+        <button type="button" class="clear-btn" id="clearBtn">Clear all</button>
+      </div>
+      <div class="cart-list" id="cartList"></div>
+      <p class="cart-empty" id="cartEmpty">Your cart is empty. Add something you like.</p>
+
+      <footer class="cart-footer">
+        <p>Subtotal</p>
+        <span class="subtotal" id="subtotal">$0</span>
+      </footer>
+    </section>
+    
+
+  </main>
+
+</body>
+</html>
