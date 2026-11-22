@@ -168,7 +168,7 @@ function renderCart() {
     productName.textContent = product.name;
 
     const productnum = document.createElement("span");
-    productnum.textContent = `× ${product.num}`;
+    productnum.textContent = `* ${product.num}`;
 
     const productPrice = document.createElement("span");
     productPrice.textContent = "$" + product.price * product.num;
