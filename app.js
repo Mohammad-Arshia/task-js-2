@@ -1,52 +1,49 @@
-const proName = document.getElementById("name");
-const proCategory = document.getElementById("category");
-const proDescription = document.getElementById("description");
-const proPrice = document.getElementById("price");
-const proImage = document.getElementById("image");
-const proTag = document.getElementById("tag");
-const addproBtn = document.getElementById("add-btn");
+const products = [
+  {
+    id: 1,
+    name: "Wireless Headphones",
+    category: "AUDIO",
+    description: "Rich sound, all-day comfort.",
+    price: 50,
+    image: "assets/headphone.jpg",
+    tag: "POPULAR",
+  },
+  {
+    id: 2,
+    name: "Everyday Sneakers",
+    category: "FOOTWEAR",
+    description: "Fresh steps, effortless style.",
+    price: 80,
+    image: "assets/shoes.jpg",
+    tag: "NEW",
+  },
+  {
+    id: 3,
+    name: "Wristwatch",
+    category: "ACCESSORIES",
+    description: "Timeless looks for every day.",
+    price: 120,
+    image: "assets/Wristwatch.jpg",
+    tag: "",
+  },
+  {
+    id: 4,
+    name: "Urban Backpack",
+    category: "LIFESTYLE",
+    description: "Made for wherever you go.",
+    price: 35,
+    image: "assets/backpack.jpg",
+    tag: "",
+  },
+];
+const cart = [];
 
-let products = JSON.parse(localStorage.getItem("products")) || [];
-
-function addpro() {
-  if (
-    !proName.value.trim() ||
-    !proCategory.value.trim() ||
-    !proDescription.value.trim() ||
-    !proPrice.value.trim() ||
-    !proImage.value.trim() ||
-    !proTag.value.trim()
-  ) {
-    alert("فیلد هارو چک انگار جا انداختی");
-    return;
-  }
-
-  const newproduct = {
-    id: Date.now(),
-    name: proName.value,
-    category: proCategory.value,
-    description: proDescription.value,
-    price: Number(proPrice.value),
-    image: proImage.value,
-    tag: proTag.value,
-  };
-
-  products.push(newproduct);
-  localStorage.setItem("products", JSON.stringify(products));
-  displayPro();
-
-  proName.value = "";
-  proCategory.value = "";
-  proDescription.value = "";
-  proPrice.value = "";
-  proImage.value = "";
-  proTag.value = "";
-}
-
-addproBtn.addEventListener("click", (event) => {
-  event.preventDefault();
-  addpro();
-});
+const cartItemsContainer = document.getElementById("cartList");
+const cartCount = document.getElementById("cartBadge");
+const cartTitleCount = document.getElementById("cartItemsContainer");
+const cartEmpty = document.getElementById("cartEmpty");
+const subtotal = document.getElementById("subtotal");
+const clearCartButton = document.getElementById("clearBtn");
 
 const prolist = document.getElementById("products");
 const productCount = document.getElementById("productCount");
@@ -104,9 +101,7 @@ function displayPro() {
     addButton.textContent = "+ Add to Cart";
 
     proBtn.append(price, addButton);
-
     proInfo.append(proCategory, proName, proDescription, proBtn);
-
     proCard.append(proImage, proInfo);
 
     return proCard;
@@ -115,15 +110,6 @@ function displayPro() {
   prolist.append(...proElements);
   productCount.textContent = `${products.length} products`;
 }
-
-const cart = [];
-
-const cartItemsContainer = document.getElementById("cartList");
-const cartCount = document.getElementById("cartBadge");
-const cartTitleCount = document.getElementById("cartItemsContainer");
-const cartEmpty = document.getElementById("cartEmpty");
-const subtotal = document.getElementById("subtotal");
-const clearCartButton = document.getElementById("clearBtn");
 
 function addToBag(productId) {
   const foundItem = cart.find((item) => item.id === productId);
@@ -141,18 +127,8 @@ function addToBag(productId) {
   renderCart();
 }
 
-prolist.addEventListener("click", (event) => {
-  const addButton = event.target.closest(".add-btn");
-
-  if (!addButton) return;
-
-  const productId = Number(addButton.dataset.productId);
-
-  addToBag(productId);
-});
-
 function renderCart() {
-  cartItemsContainer.replaceChildren();
+  cartItemsContainer.innerHTML = "";
 
   if (cart.length === 0) {
     cartEmpty.style.display = "block";
@@ -160,15 +136,15 @@ function renderCart() {
     cartEmpty.style.display = "none";
   }
 
-  const cartElements = cart.map((product, index) => {
+  cart.forEach((product, index) => {
     const cartItem = document.createElement("div");
     cartItem.className = "cart-item";
 
     const productName = document.createElement("span");
     productName.textContent = product.name;
 
-    const productnum = document.createElement("span");
-    productnum.textContent = `* ${product.num}`;
+    const productQuantity = document.createElement("span");
+    productQuantity.textContent = `× ${product.num}`;
 
     const productPrice = document.createElement("span");
     productPrice.textContent = "$" + product.price * product.num;
@@ -176,15 +152,13 @@ function renderCart() {
     const removeButton = document.createElement("button");
     removeButton.className = "remove-btn";
     removeButton.dataset.cartIndex = index;
-    removeButton.textContent = "Remove";
     removeButton.type = "button";
+    removeButton.textContent = "Remove";
 
-    cartItem.append(productName, productnum, productPrice, removeButton);
+    cartItem.append(productName, productQuantity, productPrice, removeButton);
 
-    return cartItem;
+    cartItemsContainer.appendChild(cartItem);
   });
-
-  cartItemsContainer.append(...cartElements);
 
   let count = 0;
 
@@ -207,7 +181,6 @@ function renderCart() {
 
   productCards.forEach((productCard) => {
     const productId = Number(productCard.dataset.proID);
-
     const currentItem = cart.find((item) => item.id === productId);
 
     let badge = productCard.querySelector(".cart-badge-small");
@@ -216,15 +189,69 @@ function renderCart() {
       if (!badge) {
         badge = document.createElement("div");
         badge.className = "cart-badge-small";
+
+        const quantity = document.createElement("span");
+        quantity.className = "quantity";
+
+        const increaseButton = document.createElement("button");
+        increaseButton.className = "in-btn";
+        increaseButton.type = "button";
+        increaseButton.textContent = "+";
+
+        const decreaseButton = document.createElement("button");
+        decreaseButton.className = "de-btn";
+        decreaseButton.type = "button";
+        decreaseButton.textContent = "-";
+
+        badge.append(increaseButton, quantity, decreaseButton);
         productCard.appendChild(badge);
       }
 
-      badge.textContent = `${currentItem.num} عدد در سبد`;
+      const quantity = badge.querySelector(".quantity");
+      quantity.textContent = currentItem.num;
     } else if (badge) {
       badge.remove();
     }
   });
 }
+
+prolist.addEventListener("click", (event) => {
+  const addButton = event.target.closest(".add-btn");
+
+  if (!addButton) return;
+
+  const productId = Number(addButton.dataset.productId);
+  addToBag(productId);
+});
+
+prolist.addEventListener("click", (event) => {
+  const increaseButton = event.target.closest(".in-btn");
+  const decreaseButton = event.target.closest(".de-btn");
+
+  if (!increaseButton && !decreaseButton) return;
+
+  const productCard = event.target.closest(".product");
+  const productId = Number(productCard.dataset.proID);
+
+  const currentItem = cart.find((item) => item.id === productId);
+
+  if (!currentItem) return;
+
+  if (increaseButton) {
+    currentItem.num += 1;
+  }
+
+  if (decreaseButton) {
+    currentItem.num -= 1;
+
+    if (currentItem.num === 0) {
+      const cartIndex = cart.findIndex((item) => item.id === productId);
+      cart.splice(cartIndex, 1);
+    }
+  }
+
+  renderCart();
+});
 
 cartItemsContainer.addEventListener("click", (event) => {
   const removeButton = event.target.closest(".remove-btn");
@@ -232,7 +259,6 @@ cartItemsContainer.addEventListener("click", (event) => {
   if (!removeButton) return;
 
   const cartIndex = Number(removeButton.dataset.cartIndex);
-
   cart.splice(cartIndex, 1);
 
   renderCart();
@@ -243,5 +269,5 @@ clearCartButton.addEventListener("click", () => {
   renderCart();
 });
 
-renderCart();
 displayPro();
+renderCart();
